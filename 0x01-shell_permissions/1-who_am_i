@@ -1,2 +1,10 @@
 #!/bin/bash
-whoami
+
+# Get the effective username of the current user
+username=$(whoami)
+
+# Print the effective username
+echo "$username"
+
+# Add a new line after the output
+echo
