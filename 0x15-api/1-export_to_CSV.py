@@ -1,24 +1,16 @@
 #!/usr/bin/python3
-""" Export api to csv"""
+''' export data in the CSV format '''
+from sys import argv
+from requests import get
 import csv
-import requests
-import sys
+
 
 if __name__ == '__main__':
-    user = sys.argv[1]
-    url_user = 'https://jsonplaceholder.typicode.com/users/' + user
-    res = requests.get(url_user)
-    """ANYTHING"""
-    user_name = res.json().get('username')
-    task = url_user + '/todos'
-    res = requests.get(task)
-    tasks = res.json()
+    url = 'https://jsonplaceholder.typicode.com'
+    usr = get(url + '/users/' + argv[1]).json()['username']
+    todos = get(url + '/todos?userId=' + argv[1]).json()
 
-    with open('{}.csv'.format(user), 'w') as csvfile:
-        for task in tasks:
-            completed = task.get('completed')
-            """Complete"""
-            title_task = task.get('title')
-            """Done"""
-            csvfile.write('"{}","{}","{}","{}"\n'.format(
-                user, user_name, completed, title_task))
+    with open('{}.csv'.format(argv[1]), 'w') as file:
+        writer = csv.writer(file, quoting=csv.QUOTE_ALL)
+        for todo in todos:
+            writer.writerow([argv[1], usr, todo['completed'], todo['title']])

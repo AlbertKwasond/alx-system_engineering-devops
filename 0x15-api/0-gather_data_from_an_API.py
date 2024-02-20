@@ -1,30 +1,20 @@
 #!/usr/bin/python3
-'''
-gather employee data from API
-'''
-
-import re
+''' gather data from an API '''
 import requests
-import sys
-
-REST_API = "https://jsonplaceholder.typicode.com"
+from sys import argv
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        if re.fullmatch(r'\d+', sys.argv[1]):
-            id = int(sys.argv[1])
-            req = requests.get('{}/users/{}'.format(REST_API, id)).json()
-            task_req = requests.get('{}/todos'.format(REST_API)).json()
-            emp_name = req.get('name')
-            tasks = list(filter(lambda x: x.get('userId') == id, task_req))
-            completed_tasks = list(filter(lambda x: x.get('completed'), tasks))
-            print(
-                'Employee {} is done with tasks({}/{}):'.format(
-                    emp_name,
-                    len(completed_tasks),
-                    len(tasks)
-                )
-            )
-            if len(completed_tasks) > 0:
-                for task in completed_tasks:
-                    print('\t {}'.format(task.get('title')))
+    # get employee response [used to get name in line 19]
+    url = 'https://jsonplaceholder.typicode.com'
+    user_res = requests.get(url + '/users/' + argv[1]).json()
+
+    # get total number of tasks [used to get len of all tasks in line 18]
+    todos = requests.get(url + '/todos?userId=' + argv[1]).json()
+
+    # get number completed tasks and their titles
+    titles_done = [todo['title'] for todo in todos if todo['completed']]
+
+    print('Employee {} is done with tasks({}/{}):'
+          .format(user_res['name'], len(titles_done), len(todos)))
+
+    [print('\t {}'.format(title)) for title in titles_done]
